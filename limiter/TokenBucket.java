@@ -6,8 +6,6 @@ public class TokenBucket implements LimiterAlgorithm {
     int remaining;
     long lastRequestTime;
 
-    
-
     public TokenBucket(int capacity, int refillRate) {
         this.capacity = capacity;
         this.refillRate = refillRate;
