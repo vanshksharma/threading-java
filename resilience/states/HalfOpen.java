@@ -1,16 +1,16 @@
 package resilience.states;
 
 import java.util.concurrent.Callable;
-
 import resilience.CircuitBreaker;
 import resilience.CircuitOpenException;
 
-public class HalfOpen implements CircuitStates{
+public class HalfOpen implements CircuitState{
+    private static CircuitState instance = null;
 
     @Override
     public void transition(CircuitBreaker breaker) {
         if(breaker.getSuccessCount() >= breaker.getSuccessThreshold()){
-            breaker.setState(new Closed());
+            breaker.setState(Closed.getInstance());
             breaker.setFailureCount(0);
             breaker.setLastFailedRequestTime(null);
         }
@@ -30,7 +30,7 @@ public class HalfOpen implements CircuitStates{
         breaker.getLock().lock();
         try {
             if(exceptionThrown){
-                breaker.setState(new Open());
+                breaker.setState(Open.getInstance());
                 breaker.setSuccessCount(0);
                 breaker.setFailureCount(0);
                 breaker.setLastFailedRequestTime(System.currentTimeMillis());
@@ -45,5 +45,17 @@ public class HalfOpen implements CircuitStates{
         }
 
         return value;
+    }
+
+    public static CircuitState getInstance() {
+        if(instance == null){
+            synchronized (HalfOpen.class) {
+                if(instance == null){
+                    instance = new HalfOpen();
+                }
+            }
+        }
+        
+        return instance;
     }
 }

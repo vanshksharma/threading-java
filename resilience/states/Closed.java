@@ -3,12 +3,13 @@ package resilience.states;
 import java.util.concurrent.Callable;
 import resilience.CircuitBreaker;
 
-public class Closed implements CircuitStates{
+public class Closed implements CircuitState{
+    private static CircuitState instance = null;
 
     @Override
     public void transition(CircuitBreaker breaker) {
         if(breaker.getFailureCount() >= breaker.getFailureThreshold()){
-            breaker.setState(new Open());
+            breaker.setState(Open.getInstance());
             breaker.setFailureCount(0);
             breaker.setSuccessCount(0);
             breaker.setLastFailedRequestTime(System.currentTimeMillis());
@@ -42,5 +43,17 @@ public class Closed implements CircuitStates{
         }
 
         return value;
+    }
+
+    public static CircuitState getInstance() {
+        if(instance == null){
+            synchronized (Closed.class) {
+                if(instance == null){
+                    instance = new Closed();
+                }
+            }
+        }
+        
+        return instance;
     }
 }

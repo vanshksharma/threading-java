@@ -3,18 +3,18 @@ package resilience;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import resilience.states.CircuitStates;
+import resilience.states.CircuitState;
 import resilience.states.Closed;
 
 public class CircuitBreaker {
-    private CircuitStates state;
+    private CircuitState state;
     private final int failureThreshold;
     private final int successThreshold;
     private final int timeout;
     private int successCount;
     private int failureCount;
     private Long lastFailedRequestTime;
-    private Lock lock;
+    private final Lock lock;
 
     public CircuitBreaker(int failureThreshold, int successThreshold, int timeout) {
         this.state = new Closed();
@@ -31,11 +31,11 @@ public class CircuitBreaker {
         return state.execute(task, this);
     }
 
-    public CircuitStates getState() {
+    public CircuitState getState() {
         return state;
     }
 
-    public void setState(CircuitStates state) {
+    public void setState(CircuitState state) {
         this.state = state;
     }
 
