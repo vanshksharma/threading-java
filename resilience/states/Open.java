@@ -5,7 +5,7 @@ import resilience.CircuitBreaker;
 import resilience.CircuitOpenException;
 
 public class Open implements CircuitState{
-    private static CircuitState instance;
+    private volatile static CircuitState instance;
 
     @Override
     public void transition(CircuitBreaker breaker) {
@@ -24,13 +24,13 @@ public class Open implements CircuitState{
                 transition(breaker);
             }
             currentState = breaker.getState();
+            if(currentState instanceof Open){
+                throw new CircuitOpenException("Circuit is in OPEN state");
+            }
         } finally {
             breaker.getLock().unlock();
         }
 
-        if(currentState instanceof Open){
-            throw new CircuitOpenException("Circuit is in OPEN state");
-        }
         return currentState.execute(task, breaker);
     }
 

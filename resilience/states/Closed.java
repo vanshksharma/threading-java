@@ -2,9 +2,10 @@ package resilience.states;
 
 import java.util.concurrent.Callable;
 import resilience.CircuitBreaker;
+import resilience.CircuitOpenException;
 
 public class Closed implements CircuitState{
-    private static CircuitState instance = null;
+    private volatile static CircuitState instance = null;
 
     @Override
     public void transition(CircuitBreaker breaker) {
@@ -17,9 +18,21 @@ public class Closed implements CircuitState{
     }
 
     @Override
-    public <T> T execute(Callable<T> task, CircuitBreaker breaker) {
+    public <T> T execute(Callable<T> task, CircuitBreaker breaker) throws CircuitOpenException{
         T value = null;
         boolean exceptionThrown = false;
+        CircuitState currentState;
+
+        breaker.getLock().lock();
+        try {
+            currentState = breaker.getState();
+            if(!(currentState instanceof Closed)){
+                return null;
+            }
+        }
+        finally{
+            breaker.getLock().unlock();
+        }
 
         try {
             value = task.call();
@@ -29,15 +42,17 @@ public class Closed implements CircuitState{
 
         breaker.getLock().lock();
         try {
-            if(exceptionThrown){
-                breaker.setFailureCount(breaker.getFailureCount() + 1);
+            if(breaker.getState() instanceof Closed){
+                if(exceptionThrown){
+                    breaker.setFailureCount(breaker.getFailureCount() + 1);
+                }
+                else{
+                    breaker.setFailureCount(0);
+                    breaker.setLastFailedRequestTime(null);
+                }
+                transition(breaker);
             }
-            else{
-                breaker.setFailureCount(0);
-                breaker.setLastFailedRequestTime(null);
-            }
-            transition(breaker);
-        } catch (Exception ignore) {}
+        }
         finally{
             breaker.getLock().unlock();
         }
