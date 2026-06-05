@@ -45,16 +45,16 @@ public class MyConcurrentHashMap<K,V>{
         }
     }
 
-    MyConcurrentHashMap(){
+    public MyConcurrentHashMap(){
         this(16);
     }
 
-    MyConcurrentHashMap(int capacity){
+    public MyConcurrentHashMap(int capacity){
         this(capacity, 0.75F);
     }
 
     @SuppressWarnings("unchecked")
-    MyConcurrentHashMap(int capacity, float loadFactor){
+    public MyConcurrentHashMap(int capacity, float loadFactor){
         this.capacity = nextPowerOfTwo(capacity);
         this.loadFactor = loadFactor;
         buckets = (MapNode[]) new Object[this.capacity];
