@@ -9,7 +9,7 @@ public class Main {
             server.get("/hello", (request) -> {
                 HttpResponse response = new HttpResponse();
                 response.setStatusCode(200);
-                response.setBody("Hello, World!");
+                response.setBody("{\"message\" : \"Hello World!!\"}");
                 return response;
             });
 
