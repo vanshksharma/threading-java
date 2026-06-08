@@ -31,6 +31,7 @@ public class HttpServer {
     }
 
     public void start() throws IOException{
+        System.out.println("Server Started.....");
         executor = new FixedThreadPool(poolSize);
         while(!serverSocket.isClosed()){
             try {
@@ -43,6 +44,7 @@ public class HttpServer {
     }
 
     public void stop() throws IOException{
+        System.out.println("Stopping Server....");
         executor.shutdown();
         serverSocket.close();
     }
