@@ -1,7 +1,9 @@
 package cache;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class LRUCache<K,V> {
     private final int capacity;
@@ -51,11 +53,50 @@ public class LRUCache<K,V> {
         }
     }
 
-    public LRUCache(int capacity) {
+    public LRUCache(int capacity){
         this.capacity = capacity;
         head = null;
         tail = null;
         map = new HashMap<>();
+    }
+
+    synchronized public boolean containsKey(K key){
+        return map.containsKey(key);
+    }
+
+    synchronized public Set<K> getKeys(){
+        return new HashSet<>(map.keySet());
+    }
+
+    synchronized public void removeKey(K key){
+        if(map.containsKey(key)){
+            ListNode node = map.get(key);
+            if(node == head){
+                ListNode temp = head.getNext();
+                head.setNext(null);
+                if(temp != null){
+                    temp.setPrev(null);
+                }
+                head = temp;
+            }
+            else if(node == tail){
+                ListNode prev = node.getPrev();
+                tail.setPrev(null);
+                prev.setNext(null);
+                tail = prev;
+
+            }
+            else{
+                ListNode prev = node.getPrev();
+                ListNode next = node.getNext();
+                node.setNext(null);
+                node.setPrev(null);
+                prev.setNext(next);
+                next.setPrev(prev);
+            }
+
+            map.remove(key);
+        }
     }
 
     synchronized public V get(K key){
