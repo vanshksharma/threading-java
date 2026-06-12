@@ -1,5 +1,8 @@
 package hash;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -17,15 +20,27 @@ public class ConsistentHashing {
     }
 
     private String getActualServer(String virtualServer){
-        return virtualServer.split("_")[0];
+        return virtualServer.substring(0, virtualServer.lastIndexOf('_'));
     }
+
+    private int hash(String key) {
+    try {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] bytes = md.digest(key.getBytes(StandardCharsets.UTF_8));
+        // Take first 4 bytes as an int, mask to positive
+        return ((bytes[0] & 0xFF) << 24 | (bytes[1] & 0xFF) << 16 |
+                (bytes[2] & 0xFF) << 8  | (bytes[3] & 0xFF)) & 0x7fffffff;
+    } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException(e);
+    }
+}
 
     public void addServer(String server){
         lock.writeLock().lock();
         try {
             for(int i=0; i<virtualNodes; i++){
                 String serverId = server + "_" + i;
-                int serverHash = serverId.hashCode() & 0x7fffffff;
+                int serverHash = hash(serverId);
                 ring.put(serverHash, serverId);
             }
         }
@@ -37,7 +52,8 @@ public class ConsistentHashing {
     public String getServer(String key){
         lock.readLock().lock();
         try {
-            int keyHash = key.hashCode() & 0x7fffffff;
+            if (ring.isEmpty()) throw new IllegalStateException("No servers in ring");
+            int keyHash = hash(key);
             Integer virtualServerHash = ring.ceilingKey(keyHash);
             if(virtualServerHash == null){
                 return getActualServer(ring.get(ring.firstKey()));
@@ -55,7 +71,7 @@ public class ConsistentHashing {
         try {
             for(int i=0; i<virtualNodes; i++){
                 String serverId = server + "_" + i;
-                int serverHash = serverId.hashCode() & 0x7fffffff;
+                int serverHash = hash(serverId);
                 ring.remove(serverHash);
             }
         }
