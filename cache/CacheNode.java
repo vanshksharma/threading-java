@@ -1,6 +1,7 @@
 package cache;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import server.HttpResponse;
 import server.HttpServer;
 
@@ -13,6 +14,14 @@ public class CacheNode {
         cache = new LRUCache<>(cacheCapacity);
         server = new HttpServer(port, poolSize);
         this.nodeNumber = nodeNumber;
+    }
+
+    public int getNodeNumber(){
+        return nodeNumber;
+    }
+
+    public String getAddress() throws UnknownHostException{
+        return server.getAddress();
     }
 
     public void start() throws IOException{
