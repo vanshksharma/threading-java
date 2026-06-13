@@ -27,7 +27,6 @@ public class ConsistentHashing {
     try {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] bytes = md.digest(key.getBytes(StandardCharsets.UTF_8));
-        // Take first 4 bytes as an int, mask to positive
         return ((bytes[0] & 0xFF) << 24 | (bytes[1] & 0xFF) << 16 |
                 (bytes[2] & 0xFF) << 8  | (bytes[3] & 0xFF)) & 0x7fffffff;
     } catch (NoSuchAlgorithmException e) {

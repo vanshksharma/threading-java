@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import threadpool.FixedThreadPool;
@@ -19,6 +21,7 @@ public class HttpServer {
     private ServerSocket serverSocket;
     private int poolSize;
     private FixedThreadPool executor;
+    private int port;
 
     public HttpServer() throws IOException{
         this(8000, 10);
@@ -27,7 +30,13 @@ public class HttpServer {
     public HttpServer(int port, int poolSize) throws IOException {
         this.routes = new HashMap<>();
         this.poolSize = poolSize;
+        this.port = port;
         serverSocket = new ServerSocket(port);
+    }
+
+    public String getAddress() throws UnknownHostException{
+        String host = InetAddress.getLocalHost().getHostAddress();
+        return host + ":" + port;
     }
 
     public void start() throws IOException{
