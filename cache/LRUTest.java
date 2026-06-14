@@ -1,6 +1,6 @@
 package cache;
 
-public class Main {
+public class LRUTest {
     public static void main(String[] args) {
         LRUCache<Integer, String> cache = new LRUCache<>(5);
         System.out.println(cache.get(1));

@@ -27,6 +27,14 @@ public class Main {
                 return response;
             });
 
+            server.post("/user/:id", (request) -> {
+                System.out.println(request.getBody());
+                HttpResponse response = new HttpResponse();
+                response.setStatusCode(200);
+                response.setBody("User id is: " + request.getPathParams().get("id"));
+                return response;
+            });
+
             server.get("/throwError", (request) -> {
                 throw new Exception("Exception is thrown");
             });
