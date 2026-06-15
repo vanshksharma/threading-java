@@ -63,4 +63,10 @@ public class HttpResponse {
         response.setBody(body);
         return response;
     }
+
+    public static HttpResponse noContent(){
+        HttpResponse response = new HttpResponse();
+        response.setStatusCode(204);
+        return response;
+    }
 }
