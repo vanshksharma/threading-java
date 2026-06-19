@@ -69,4 +69,10 @@ public class HttpResponse {
         response.setStatusCode(204);
         return response;
     }
+
+    public static HttpResponse conflict(String body){
+        HttpResponse response = new HttpResponse();
+        response.setStatusCode(409);
+        return response;
+    }
 }
