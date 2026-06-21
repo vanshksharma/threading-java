@@ -73,6 +73,7 @@ public class HttpResponse {
     public static HttpResponse conflict(String body){
         HttpResponse response = new HttpResponse();
         response.setStatusCode(409);
+        response.setBody(body);
         return response;
     }
 }
