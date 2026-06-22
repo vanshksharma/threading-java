@@ -74,6 +74,11 @@ public class HttpServer {
         routes.put("DELETE" + "@@" + route, handler);
     }
 
+    public void any(HttpHandler handler){
+        if(routes.containsKey("all")) throw new IllegalStateException("Wildcard route already registered");
+        routes.put("all", handler);
+    }
+
     public HttpHandler matchRoute(HttpRequest request) throws NoRouteFoundException{
         for (Map.Entry<String, HttpHandler> entry : routes.entrySet()) {
             Map<String, String> tempParams = new HashMap<>();
@@ -103,6 +108,10 @@ public class HttpServer {
                 tempParams.forEach(request::setPathParam);
                 return entry.getValue();
             }
+        }
+
+        if(routes.containsKey("all")){
+            return routes.get("all");
         }
 
         throw new NoRouteFoundException("No Matching Routes Found");
