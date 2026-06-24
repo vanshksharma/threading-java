@@ -76,4 +76,11 @@ public class HttpResponse {
         response.setBody(body);
         return response;
     }
+
+    public static HttpResponse unavailable(String body){
+        HttpResponse response = new HttpResponse();
+        response.setStatusCode(503);
+        response.setBody(body);
+        return response;
+    }
 }
