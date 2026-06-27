@@ -83,4 +83,11 @@ public class HttpResponse {
         response.setBody(body);
         return response;
     }
+
+    public static HttpResponse tooManyRequests(String body){
+        HttpResponse response = new HttpResponse();
+        response.setStatusCode(429);
+        response.setBody(body);
+        return response;
+    }
 }
